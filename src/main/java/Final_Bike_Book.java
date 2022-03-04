@@ -39,7 +39,7 @@ public class Final_Bike_Book extends HttpServlet {
 		String dbname="parking_system_db";
 		String uname="root";
 		String pwd="root";
-		String driver="com.mysql.jdbc.Driver";
+		String driver="com.mysql.cj.jdbc.Driver";
 		String username;
 		String pnum,snum;
 		HttpSession session=request.getSession(false);

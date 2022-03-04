@@ -44,7 +44,7 @@ public class Parking_spot_info extends HttpServlet {
 		String dbname="parking_system_db";
 		String uname="root";
 		String pwd="root";
-		String driver="com.mysql.jdbc.Driver";
+		String driver="com.mysql.cj.jdbc.Driver";
 		String username;
 		HttpSession session=request.getSession(false);
 		PrintWriter out=response.getWriter();

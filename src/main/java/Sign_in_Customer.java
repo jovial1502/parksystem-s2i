@@ -52,7 +52,7 @@ public class Sign_in_Customer extends HttpServlet {
 		String dbname="parking_system_db";
 		String uname="root";
 		String pwd="root";
-		String driver="com.mysql.jdbc.Driver";
+		String driver="com.mysql.cj.jdbc.Driver";
 		 String cust_uname=request.getParameter("uname");
 	     String cust_pwd=request.getParameter("pwd");
 		try

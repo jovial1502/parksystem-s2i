@@ -46,7 +46,7 @@ public class Sign_up_cust_servlet extends HttpServlet {
 		String dbname="parking_system_db";
 		String uname="root";
 		String pwd="root";
-		String driver="com.mysql.jdbc.Driver";
+		String driver="com.mysql.cj.jdbc.Driver";
 		 String name=request.getParameter("cust_name");
 	     String V_number=request.getParameter("V_number");
 	     String V_type=request.getParameter("V_type");
