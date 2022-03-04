@@ -1,3 +1,4 @@
+package com.wildfly.parksystem;
 
 
 import java.io.IOException;
@@ -16,17 +17,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+//import com.mysql.jdbc.PreparedStatement;
+
 /**
- * Servlet implementation class Select_spot_bike
+ * Servlet implementation class Select_spot_car
  */
-@WebServlet("/Select_spot_bike")
-public class Select_spot_bike extends HttpServlet {
+@WebServlet("/Select_spot_car")
+public class Select_spot_car extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Select_spot_bike() {
+    public Select_spot_car() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -35,6 +38,7 @@ public class Select_spot_bike extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
 		String username;
 		String pnum,snum;
 		HttpSession session=request.getSession(false);
@@ -69,13 +73,13 @@ public class Select_spot_bike extends HttpServlet {
 		session.setAttribute("park",snum);
 		 
 		out.println("<div id=\"flip\" >Park Now</div><div id=\"panel\">");
-		out.println("<form action=\"Final_Bike_Book\">"
+		out.println("<form action=\"Final_Car_Book\">"
 				+ "<input type=\"submit\" name=\"parking\"  value=\"park\"></form>");
 		out.println("</div></div>");
 		
 		
 		out.println("<div id=\"flip2\" >Advanced Booking</div><div id=\"panel2\">");
-		out.println("<form action=\"Final_Bike_Book\">");
+		out.println("<form action=\"Final_Car_Book\">");
 		Date date=new Date();
 	    System.out.println(date.toInstant());
 	    String day=date.toString().substring(8, 10);

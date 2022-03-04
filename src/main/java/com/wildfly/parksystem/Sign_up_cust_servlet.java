@@ -1,4 +1,4 @@
-
+package com.wildfly.parksystem;
 
 import java.io.IOException;
 import java.io.PrintWriter; 
@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import com.wildfly.parksystem.utils.Utils;
 
 /**
  * Servlet implementation class Sign_up_cust_servlet
@@ -42,11 +44,7 @@ public class Sign_up_cust_servlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String url="jdbc:mysql://" + System.getenv("MYSQL_SERVICE_HOST") + ":3306/";
-		String dbname="parking_system_db";
-		String uname="root";
-		String pwd="root";
-		String driver="com.mysql.cj.jdbc.Driver";
+	
 		 String name=request.getParameter("cust_name");
 	     String V_number=request.getParameter("V_number");
 	     String V_type=request.getParameter("V_type");
@@ -71,9 +69,9 @@ public class Sign_up_cust_servlet extends HttpServlet {
 
 		try
 		{
-		Class.forName(driver).newInstance();
-		Connection con=DriverManager.getConnection(url+dbname,uname,pwd);
-	
+		Class.forName(Utils.DRIVER).newInstance();
+		Connection con = Utils.getConnection();
+		
 		response.setContentType("text/html");
 		vtype=Integer.parseInt(V_type);
 		if(vtype!=0 & vtype!=1)

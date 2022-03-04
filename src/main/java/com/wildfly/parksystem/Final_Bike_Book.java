@@ -1,4 +1,4 @@
-
+package com.wildfly.parksystem;
 
 import java.io.IOException;
 import java.io.PrintWriter;
