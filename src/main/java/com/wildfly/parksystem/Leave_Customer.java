@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.wildfly.parksystem.utils.Utils;
+
 //import com.mysql.jdbc.Statement;
 
 /**
@@ -37,19 +39,14 @@ public class Leave_Customer extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String url="jdbc:mysql://localhost:3306/";
-		String dbname="parking_system_db";
-		String uname="root";
-		String pwd="root";
-		String driver="com.mysql.cj.jdbc.Driver";
 		String username;
 		String pnum,snum;
 		String book_in_time;
 		String vtype;
 		HttpSession session=request.getSession(false);
 		PrintWriter out=response.getWriter();
-		if(session!=null)
-		{
+		
+		if (session!=null) {
 			username=(String) session.getAttribute("username");
 			/*out.println("Logged in as "+username);
 			request.getRequestDispatcher("link.html").include(request, response);
@@ -67,10 +64,11 @@ public class Leave_Customer extends HttpServlet {
 			
 			
 			String park=request.getParameter("park");
-			if(park.equals("Cancel Booking"))
-			{
-				try{
-					Connection con=DriverManager.getConnection(url+dbname,uname,pwd);
+			
+			if (park.equals("Cancel Booking")) {
+				try {
+					Class.forName(Utils.DRIVER).newInstance();
+					Connection con = Utils.getConnection();	
 					java.sql.Statement s=con.createStatement();
 					java.sql.Statement s2=con.createStatement();
 					out.print("<header><div class=\"container\"><div class=\"logo pull-left animated wow fadeInLeft\"><img src=\"images/logo.jpg\" height=\"80px\"  width=\"65px\" >That's my spot</div></div></header>");
@@ -83,37 +81,33 @@ public class Leave_Customer extends HttpServlet {
 					snum=r.getString(2);
 					
 				    out.print("<div class=\"banner\"><div class=\"container\"><div class=\"banner-info\">");
-					
-					
-				 //   out.println("You've to now pay "+bill+"<br><hr>");
-					if(i==0)
-					{
+
+					if (i==0) {
 						System.out.println("Delete unsuccesful");
 					}
+					
 					out.println("<h3>"+snum+" is now empty for park number "+pnum+". Your booking has been successfully Cancelled!<br><hr></h3>");
 					
 					out.println("<h3><a style=\"color:white;background-color:lightgrey\"    href=\"Sign_in_customer.html\" >Sign In</a><h3></div></div></div>");
 					//request.getRequestDispatcher("Sign_in_customer.html").include(request, response);
 					out.println("</body></html>");
+					
 					con.close();
-					}
-					catch(SQLException e)
-					{
-						e.printStackTrace();
-					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
-					}
 				
+				} catch(SQLException e) {
+					e.printStackTrace();
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
 
-			}
-			else
-			{
-				try{
-					Connection con=DriverManager.getConnection(url+dbname,uname,pwd);
+			} else {
+				try {
+					Class.forName(Utils.DRIVER).newInstance();
+					Connection con = Utils.getConnection();					
+
 					java.sql.Statement s=con.createStatement();
 					java.sql.Statement s2=con.createStatement();
+					
 					out.print("<header><div class=\"container\"><div class=\"logo pull-left animated wow fadeInLeft\"><img src=\"images/logo.jpg\" height=\"80px\"  width=\"65px\" >That's my spot</div></div></header>");
 					//	out.println("<div id=\"text\">");
 
@@ -125,18 +119,17 @@ public class Leave_Customer extends HttpServlet {
 					book_in_time=r.getString(3);
 					vtype=r.getString(4);
 					Float cost;
-					if(vtype.equals("1"))
-					{
-					ResultSet r2=s2.executeQuery("select cost_of_car_parkings from parking_lot_info where park_number="+Integer.parseInt(pnum));
-					r2.next();
-					cost=Float.parseFloat(r2.getString(1));
-					}
-					else
-					{
+					
+					if(vtype.equals("1")) {
+						ResultSet r2=s2.executeQuery("select cost_of_car_parkings from parking_lot_info where park_number="+Integer.parseInt(pnum));
+						r2.next();
+						cost=Float.parseFloat(r2.getString(1));
+					} else {
 						ResultSet r2=s2.executeQuery("select cost_of_bike_parkings from parking_lot_info where park_number="+Integer.parseInt(pnum));
 						r2.next();
 						cost=Float.parseFloat(r2.getString(1));
 					}
+					
 					Date date=new Date();
 				    System.out.println(date.toInstant());
 				    String time=date.toString().substring(11, 20);
@@ -152,33 +145,23 @@ public class Leave_Customer extends HttpServlet {
 					out.println("<h3>You've to now pay "+bill+"<br><hr>  </h3>");
 					
 					
-				 //   out.println("You've to now pay "+bill+"<br><hr>");
-					if(i==0)
-					{
+					if (i==0) {
 						System.out.println("Delete unsuccesful");
 					}
+					
 					out.println("<h3>"+snum+" is now empty for park number "+pnum+"<br><hr></h3>");
 					
 					out.println("<h3><a style=\"color:white;background-color:lightgrey\"    href=\"Sign_in_customer.html\" >Sign In</a><h3></div></div></div>");
-					//request.getRequestDispatcher("Sign_in_customer.html").include(request, response);
 					out.println("</body></html>");
 					con.close();
-					}
-					catch(SQLException e)
-					{
-						e.printStackTrace();
-					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
-					}
-				
-
+				} catch(SQLException e) {
+					e.printStackTrace();
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
 			}
 		
-				}
-		else
-		{
+		} else {
 			//out.println("\nPlease login first!<br>");
 			//out.print("<button type=\"submit\" action=\"Sign_in_customer.html\">Sign in</button>");
 			response.sendRedirect("Sign_in_customer.html");

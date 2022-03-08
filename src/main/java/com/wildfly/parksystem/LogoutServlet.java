@@ -37,6 +37,7 @@ public class LogoutServlet extends HttpServlet {
 		HttpSession session=request.getSession();
 		username=(String) session.getAttribute("username");
 		session.invalidate();
+		
 		out.print("<!DOCTYPE html><html><head><title>that's my spot.com</title>"
 				+ "<link href=\"css/style3.css\" rel=\"stylesheet\" type=\"text/css\" media=\"all\" />"
 				+ "<link rel=\"stylesheet\" href=\"http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css\"><link rel=\"css/bootstrap.min.css\"><link href=\"css/bootstrap.css\" rel='stylesheet' type='text/css' /><link rel=\"stylesheet\" type=\"text/css\" href=\"css/animate.css\"/>"
@@ -47,10 +48,7 @@ public class LogoutServlet extends HttpServlet {
 				+ "<script>new WOW().init();</script>"
 				+ "</head><body>");
 		
-		
 		out.print("<header><div class=\"container\"><div class=\"logo pull-left animated wow fadeInLeft\"><img src=\"images/logo.jpg\" height=\"80px\"  width=\"65px\" >That's my spot</div></div></header>");
-	//	out.println("<div id=\"text\">");
-
 
 		out.print("<div class=\"banner\"><div class=\"container\"><div class=\"banner-info\">");
 		

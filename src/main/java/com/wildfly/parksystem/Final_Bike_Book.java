@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.wildfly.parksystem.utils.Utils;
+
 /**
  * Servlet implementation class Final_Bike_Book
  */
@@ -35,11 +37,6 @@ public class Final_Bike_Book extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String url="jdbc:mysql://" + System.getenv("MYSQL_SERVICE_HOST") + ":3306/";
-		String dbname="parking_system_db";
-		String uname="root";
-		String pwd="root";
-		String driver="com.mysql.cj.jdbc.Driver";
 		String username;
 		String pnum,snum;
 		HttpSession session=request.getSession(false);
@@ -56,12 +53,11 @@ public class Final_Bike_Book extends HttpServlet {
 				+ "</head><body>");
 		
 		
-		if(session!=null)
-		{
+		if (session!=null) {
 			username=(String) session.getAttribute("username");
 			String park=request.getParameter("parking");
-			if(park.equals("park"))
-			{
+			
+			if (park.equals("park")) {
 				snum= (String) session.getAttribute("park");
 				pnum=(String) session.getAttribute("park_num");
 				response.setContentType("text/html");
@@ -74,58 +70,57 @@ public class Final_Bike_Book extends HttpServlet {
 				
 				out.println("\nBooking for "+username+" is : <br><hr>");
 			
-				try{
-					Connection con=DriverManager.getConnection(url+dbname,uname,pwd);
+				try {
+					Class.forName(Utils.DRIVER).newInstance();
+					Connection con = Utils.getConnection();
+					
 					java.sql.PreparedStatement s=con.prepareStatement("insert into parking_spot_info values(?,?,?,?,now(),curtime(),1)");
 					s.setInt(1, Integer.parseInt(snum));
 					s.setInt(2, Integer.parseInt(pnum));
 					s.setInt(3,0);
 					s.setInt(4, Integer.parseInt(username));
 					int i=s.executeUpdate();
-					if(i==0)
-					{
+					
+					if (i==0) {
 						System.out.println("Book unsuccesful");
 					}
+					
 					String booked="parked",vtype;
 					String[] psi=new String[8];
 					Statement stmt=con.createStatement();
 					ResultSet r2=stmt.executeQuery("select * from parking_spot_info where cid='"+username+"'");
-					if(r2.next())
-					{
-						
+					
+					if (r2.next()) {						
 						for(int j=1;j<=7;j++)
 							psi[j]=r2.getString(j);
 					}
-					if(Integer.parseInt(psi[7])==0)
-					{
+					
+					if(Integer.parseInt(psi[7])==0) {
 						booked="booked";
 					}
+					
 					if(psi[3].equals("0"))
 						vtype="Bike";
 					else
 						vtype="Car";
-						out.println("You've "+booked+" at<br><hr> Spot_number : "+ psi[1]+"<br>Park number : "+psi[2]+"<br>Book date : "+psi[5]+"<br>Book in time : "+psi[6]+"<br>Vehicle Type : "+vtype);
+					
+					out.println("You've "+booked+" at<br><hr> Spot_number : "+ psi[1]+"<br>Park number : "+psi[2]+"<br>Book date : "+psi[5]+"<br>Book in time : "+psi[6]+"<br>Vehicle Type : "+vtype);
 					out.println("<br><hr>Login again when you want to leave the parking spot!");
 					session.invalidate();
 					
 					out.println("<a style=\"color:orange; href=\"Sign_in_customer.html\">Sign in</a>");
-					//request.getRequestDispatcher("Sign_in_customer.html").include(request, response);
-				//	out.println("</body></html>");
 					con.close();
-					}
-					catch(SQLException e)
-					{
-						e.printStackTrace();
-					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
-					}
+					
+				} catch(SQLException e) {
+					e.printStackTrace();
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+				
 				out.print("</div>");
 				out.println("</body></html>");
-			}
-			else
-			{
+			
+			} else {
 				String date=request.getParameter("date");
 				String hour=request.getParameter("hour");
 				snum= (String) session.getAttribute("park");
@@ -135,12 +130,10 @@ public class Final_Bike_Book extends HttpServlet {
 				out.print("<header><div class=\"container\"><div class=\"logo pull-left animated wow fadeInLeft\"><img src=\"images/logo.jpg\" height=\"80px\"  width=\"65px\" >That's my spot</div></div></header>");
 				out.println("<div id=\"text\">");
 				out.println("Logged in as "+username);
-
-				//out.println("<a style=\"color:orange; float: right;background-color:lightgrey\"    href=\"LogoutServlet\" >Logout</a>");
 				
 				out.println("\nBooking for "+username+" is : <br><hr>");
 			
-				try{
+				try {
 					Date date1=new Date();
 				    String date_inp=date1.toInstant().toString().substring(0, 10);
 				    StringBuffer temp=new StringBuffer(date_inp);
@@ -150,61 +143,57 @@ public class Final_Bike_Book extends HttpServlet {
 				    System.out.println("In final bike book : "+temp.toString());
 				    System.out.println("In final bike book : "+hour);
 				    
-					Connection con=DriverManager.getConnection(url+dbname,uname,pwd);
-					java.sql.PreparedStatement s=con.prepareStatement("insert into parking_spot_info values(?,?,?,?,'"+temp.toString()+"','"+hour+":00:00',0)");
+					Class.forName(Utils.DRIVER).newInstance();
+					Connection con = Utils.getConnection();
+					
+				    java.sql.PreparedStatement s=con.prepareStatement("insert into parking_spot_info values(?,?,?,?,'"+temp.toString()+"','"+hour+":00:00',0)");
 					s.setInt(1, Integer.parseInt(snum));
 					s.setInt(2, Integer.parseInt(pnum));
 					s.setInt(3, 0);
 					s.setInt(4, Integer.parseInt(username));
 					int i=s.executeUpdate();
-					if(i==0)
-					{
+					
+					if (i==0) {
 						System.out.println("Book unsuccesful");
 					}
+					
 					String booked="parked",vtype;
 					String[] psi=new String[8];
 					Statement stmt=con.createStatement();
 					ResultSet r2=stmt.executeQuery("select * from parking_spot_info where cid='"+username+"'");
-					if(r2.next())
-					{
-						
+					
+					if (r2.next()) {						
 						for(int j=1;j<=7;j++)
 							psi[j]=r2.getString(j);
 					}
-					if(Integer.parseInt(psi[7])==0)
-					{
+					
+					if (Integer.parseInt(psi[7])==0) {
 						booked="booked";
 					}
+					
 					if(psi[3].equals("0"))
 						vtype="Bike";
 					else
 						vtype="Car";
-						out.println("You've "+booked+" at<br><hr> Spot_number : "+ psi[1]+"<br>Park number : "+psi[2]+"<br>Book date : "+psi[5]+"<br>Book in time : "+psi[6]+"<br>Vehicle Type : "+vtype);
+					
+					out.println("You've "+booked+" at<br><hr> Spot_number : "+ psi[1]+"<br>Park number : "+psi[2]+"<br>Book date : "+psi[5]+"<br>Book in time : "+psi[6]+"<br>Vehicle Type : "+vtype);
 					out.println("<br><hr>Login again when you want to leave the parking spot!");
 					session.invalidate();
 					
 					out.println("<a href=\"Sign_in_customer.html\">Sign in</a>");
-					//request.getRequestDispatcher("Sign_in_customer.html").include(request, response);
-				//	out.println("</body></html>");
 					con.close();
-					}
-					catch(SQLException e)
-					{
-						e.printStackTrace();
-					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
-					}
+					
+				} catch(SQLException e) {
+					e.printStackTrace();
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+				
 				out.print("</div>");
 				out.println("</body></html>");
 			}
-		
-		
-		
-		}
-		else
-		{
+
+		} else {
 			//out.println("\nPlease login first!<br>");
 			//out.print("<button type=\"submit\" action=\"Sign_in_customer.html\">Sign in</button>");
 			response.sendRedirect("Sign_in_customer.html");

@@ -40,7 +40,6 @@ public class Parking_spot_info extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		//response.getWriter().append("Served at: ").append(request.getContextPath());
 		String url="jdbc:mysql://" + System.getenv("MYSQL_SERVICE_HOST") + ":3306/";
 		String dbname="parking_system_db";
 		String uname="root";
@@ -60,132 +59,108 @@ public class Parking_spot_info extends HttpServlet {
 				+ "</head><body>");
 		
 		
-		if(session!=null)
-		{
+		if (session!=null) {
 			username=(String) session.getAttribute("username");
 			out.print("<header><div class=\"container\"><div class=\"logo pull-left animated wow fadeInLeft\"><img src=\"images/logo.jpg\" height=\"80px\"  width=\"65px\" >That's my spot</div></div></header>");
 			out.println("<div id=\"text\">");
 			out.println("Logged in as "+username);
 			out.println("<a style=\"color:white;float: right;background-color:lightgrey\"    href=\"LogoutServlet\" >Logout</a>");
-		//	request.getRequestDispatcher("link.html").include(request, response);
 			out.println("<br><hr>");
-		pnum= request.getParameter("action");
-		response.setContentType("text/html");
-		out.println("<html><head><style>.booked{ background-color:orange; }.parked{ background-color:red; }.notbooked{ background-color:green; }</style></head><body>");
-		try{
-			Connection con=DriverManager.getConnection(url+dbname,uname,pwd);
-			Statement s=con.createStatement();
-			ResultSet r=s.executeQuery("select * from parking_lot_info where park_number="+Integer.parseInt(pnum));
-			String[] psi=new String[10];
-			session.setAttribute("park_num", pnum);
-			java.sql.ResultSetMetaData rsmd=r.getMetaData();
 			
-			out.println("<div class=\"images\"> ");
+			pnum= request.getParameter("action");
+			response.setContentType("text/html");
+			out.println("<html><head><style>.booked{ background-color:orange; }.parked{ background-color:red; }.notbooked{ background-color:green; }</style></head><body>");
 			
-			if(r.next())
-			{
-				for(int i=1;i<=9;i++)
-				{
-					psi[i]=r.getString(i);
-					out.println(rsmd.getColumnName(i)+" : "+psi[i]+"<br>");
+			try {
+				Connection con=DriverManager.getConnection(url+dbname,uname,pwd);
+				Statement s=con.createStatement();
+				ResultSet r=s.executeQuery("select * from parking_lot_info where park_number="+Integer.parseInt(pnum));
+				String[] psi=new String[10];
+				session.setAttribute("park_num", pnum);
+				java.sql.ResultSetMetaData rsmd=r.getMetaData();
+				
+				out.println("<div class=\"images\"> ");
+			
+				if (r.next()) {
+					for (int i=1;i<=9;i++) {
+						psi[i]=r.getString(i);
+						out.println(rsmd.getColumnName(i)+" : "+psi[i]+"<br>");
+					}
+					out.println("</div>");
+				} else {
+					System.out.println("Parking lot info not available!");
 				}
+			
+				out.println("<div class=\"images\"> ");
+				out.println("green------>available<br>orange----->booked<br>red----->parked<br>");
 				out.println("</div>");
-			}
+				
+				ResultSet r2=s.executeQuery("select spot_number,status from parking_spot_info where park_num="+Integer.parseInt(pnum)+" and vehicle_type=1 order by spot_number");
+				out.println("<div class=\"images\"> Car Parkings : ");
+				out.println("<form action=\"Select_spot_car\">");
+				System.out.println(psi[4]+" : : "+psi[5]);
+				int norows=0;
+				
+				if(!r2.first()) {
+					norows=1;
+				}
+				for(int i=1;i<=Integer.parseInt(psi[4]);i++) {
+					if(!r2.isAfterLast() && norows==0) {
+						if(i==Integer.parseInt(r2.getString(1))) {
+							if(r2.getString(2).equals("0")) {
+								out.println("<button class=\"booked\" type=\"submit\" name=\"park\" value="+i+" disabled>"+i+"</button>");
+							} else {
+								out.println("<button class=\"parked\" type=\"submit\" name=\"park\" value="+i+" disabled>"+i+"</button>");
+							}
+							
+							r2.next();
+						} else {
+							out.println("<button class=\"notbooked\" type=\"submit\" name=\"park\" value="+i+">"+i+"</button>");
+						}
+					} else {
+						out.println("<button class=\"notbooked\" type=\"submit\" name=\"park\" value="+i+">"+i+"</button>");	
+					}
+				}
+				
+				out.println("</div>");
+				out.println("</form>");
+				out.println("<div class=\"images\"> Bike Parkings : ");
+				out.println("<form action=\"Select_spot_bike\">");
+				
+				r2=s.executeQuery("select spot_number,status from parking_spot_info where park_num="+Integer.parseInt(pnum)+" and vehicle_type=0 order by spot_number");
+				norows=0;
+				
+				if(!r2.first()) {
+					norows=1;
+				}
+				for(int i=1;i<=Integer.parseInt(psi[5]);i++) {
+					if(!r2.isAfterLast() && norows==0) {
+						if(i==Integer.parseInt(r2.getString(1))) {
+							if(r2.getString(2).equals("0")) {
+								out.println("<button class=\"booked\" type=\"submit\" name=\"park\" value="+i+" disabled>"+i+"</button>");
+							} else {
+								out.println("<button class=\"parked\" type=\"submit\" name=\"park\" value="+i+" disabled>"+i+"</button>");
+							}
+							r2.next();
+						} else
+							out.println("<button class=\"notbooked\" type=\"submit\" name=\"park\" value="+i+">"+i+"</button>");
+					} else
+						out.println("<button class=\"notbooked\" type=\"submit\" name=\"park\" value="+i+">"+i+"</button>");
+				}
+				
+				out.println("</div>");
+				out.println("</form>");
+				con.close();
 			
-			else
-			{
-				System.out.println("Parking lot info not available!");
-			}
-			
-			out.println("<div class=\"images\"> ");
-			out.println("green------>available<br>orange----->booked<br>red----->parked<br>");
-			
-			out.println("</div>");
-			ResultSet r2=s.executeQuery("select spot_number,status from parking_spot_info where park_num="+Integer.parseInt(pnum)+" and vehicle_type=1 order by spot_number");
-			out.println("<div class=\"images\"> Car Parkings : ");
-			out.println("<form action=\"Select_spot_car\">");
-			System.out.println(psi[4]+" : : "+psi[5]);
-			int norows=0;
-			if(!r2.first())
-			{
-				norows=1;
-			}
-			for(int i=1;i<=Integer.parseInt(psi[4]);i++)
-			{
-				if(!r2.isAfterLast() && norows==0)
-				{
-				if(i==Integer.parseInt(r2.getString(1)))
-				{
-					if(r2.getString(2).equals("0"))
-					{
-						out.println("<button class=\"booked\" type=\"submit\" name=\"park\" value="+i+" disabled>"+i+"</button>");
-					}
-					else
-					{
-						out.println("<button class=\"parked\" type=\"submit\" name=\"park\" value="+i+" disabled>"+i+"</button>");
-					}
-					
-					r2.next();
-				}
-				else
-				{
-					out.println("<button class=\"notbooked\" type=\"submit\" name=\"park\" value="+i+">"+i+"</button>");
-				}
-				}
-				else
-				{
-					out.println("<button class=\"notbooked\" type=\"submit\" name=\"park\" value="+i+">"+i+"</button>");	
-				}
-			}
-			out.println("</div>");
-			out.println("</form>");
-			out.println("<div class=\"images\"> Bike Parkings : ");
-			out.println("<form action=\"Select_spot_bike\">");
-			r2=s.executeQuery("select spot_number,status from parking_spot_info where park_num="+Integer.parseInt(pnum)+" and vehicle_type=0 order by spot_number");
-			norows=0;
-			if(!r2.first())
-			{
-				norows=1;
-			}
-			for(int i=1;i<=Integer.parseInt(psi[5]);i++)
-			{
-				if(!r2.isAfterLast() && norows==0)
-				{
-				if(i==Integer.parseInt(r2.getString(1)))
-				{
-					if(r2.getString(2).equals("0"))
-					{
-						out.println("<button class=\"booked\" type=\"submit\" name=\"park\" value="+i+" disabled>"+i+"</button>");
-					}
-					else
-					{
-						out.println("<button class=\"parked\" type=\"submit\" name=\"park\" value="+i+" disabled>"+i+"</button>");
-					}
-					r2.next();
-				}
-				else
-					out.println("<button class=\"notbooked\" type=\"submit\" name=\"park\" value="+i+">"+i+"</button>");
-				}
-				else
-				out.println("<button class=\"notbooked\" type=\"submit\" name=\"park\" value="+i+">"+i+"</button>");
-			}
-			out.println("</div>");
-			out.println("</form>");
-			con.close();
-			}
-			catch(SQLException e)
-			{
+			} catch(SQLException e) {
+				e.printStackTrace();
+			} catch(Exception e) {
 				e.printStackTrace();
 			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-		out.println("</div>");
-		out.println("</body></html>");
-		}
-		else
-		{
+			
+			out.println("</div>");
+			out.println("</body></html>");
+		} else {
 			//out.println("\nPlease login first!<br>");
 			//out.print("<button type=\"submit\" action=\"Sign_in_customer.html\">Sign in</button>");
 			response.sendRedirect("Sign_in_customer.html");
